@@ -1,6 +1,6 @@
 #include "route_planner.h"
 #include <algorithm>
-using std::sort;
+
 RoutePlanner::RoutePlanner(RouteModel &model, float start_x, float start_y, float end_x, float end_y): m_Model(model) {
     // Convert inputs to percentage:
     start_x *= 0.01;
@@ -53,10 +53,10 @@ void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
 // - Return the pointer.
 
 RouteModel::Node *RoutePlanner::NextNode() {
-  bool compare(Route::Model *a,Route::Model *b){
+  
+  std::sort(open_list.begin(),open_list.end(),[](auto const &a, auto const &b){
     return (a->g_value+a->h_value) > (b->g_value+b->h_value);
-  }
-  sort(open_list.begin(),open_list.end(),compare); //smallest will be at the back bc > in compare
+   }); //smallest will be at the back bc > in compare
   auto *lowestNode= open_list.back();
   open_list.pop_back();
   return lowestNode;
@@ -77,7 +77,7 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
     std::vector<RouteModel::Node> path_found;
 
     // TODO: Implement your solution here.
-    while(*current_node->parent!=nullptr){
+    while(current_node->parent){
       path_found.push_back(*current_node); //placed in opposite order
       distance+= *current_node->distance(*current_node->parent);
       current_node=current_node->parent;
